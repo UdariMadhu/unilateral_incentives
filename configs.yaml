@@ -1,0 +1,16 @@
+env:
+  num_agents: 2
+  num_actions: 4
+  state_dim: 100 # 4x4x5
+  actionsLiteral: ['D', 'L', 'R', 'U']
+  reward_matrix: [[1, 0], [1, -2]]
+
+optim:
+  lr: 0.01
+  gamma: 0.99
+  hidden_dim: 32
+  num_episodes: 10000
+  steps_per_episode: 500
+  reward_aggregation: "all"
+  
+device: "cpu"

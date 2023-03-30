@@ -1,7 +1,7 @@
 env:
   num_agents: 2
   num_actions: 4
-  state_dim: 100 # 4x4x5
+  state_dim: 100 # 4x5x5
   actionsLiteral: ['D', 'L', 'R', 'U']
   reward_matrix: [[1, 0], [1, -2]]
 
@@ -11,6 +11,7 @@ optim:
   hidden_dim: 32
   num_episodes: 10000
   steps_per_episode: 500
-  reward_aggregation: "all"
+  reward_aggregation: "self"
+  lambda_phi: 0.5
   
 device: "cpu"

@@ -198,10 +198,12 @@ def reinforce_multiagent_with_phi(env,
                                      for a in actions]])).float().unsqueeze(0))
 
             # TODO: Choice between mean and sum
-            loss_phi = ((avg_r1 - avg_r2) - phi_out1[action_t] + lambda_phi *
+            loss_phi = ((avg_r1 + avg_r2) - phi_out1[action_t] + lambda_phi *
                         (policy_out2_prob * phi_out2).mean() +
                         (1 - lambda_phi) *
                         (phi_out0 * policy_out0_prob).mean()).square()
+            # print(avg_r1, avg_r2, phi_out1[action_t].item(), lambda_phi * (policy_out2_prob * phi_out2).mean().item(), 
+            #       (1 - lambda_phi) * (phi_out0 * policy_out0_prob).mean().item(), loss_phi.item())
 
             optimizer_phi.zero_grad()
             optimizer[0].zero_grad()
@@ -233,10 +235,10 @@ def reinforce_multiagent_with_phi(env,
 
         # saved_log_probs is only for second agent
         if reward_aggregation == "self":
-            policy_loss = (torch.cat(saved_log_probs) *
+            policy_loss = (-1 * torch.cat(saved_log_probs) *
                            reward_aggregator(returns)[:, -1])
         else:
-            policy_loss = (torch.cat(saved_log_probs) *
+            policy_loss = (-1 * torch.cat(saved_log_probs) *
                            reward_aggregator(returns))
         if len(policy_loss.shape) == 1:
             policy_loss_final = policy_loss.sum()

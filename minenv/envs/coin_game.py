@@ -41,6 +41,7 @@ class CoinGame(minenv.SimpleEnvironment[ActType, ObsType]):
 		self._agent_pos: Dict[ColType, NDArray[np.int64]] = {}
 
 		self._n_coins = n_coins
+		print("Placing blue and red coin alternately on the grid (instead of randomly choosing coin color)")
 
 		# two agents can be at the same location but two coins cannot
 		if len(self._locations)<1+self._n_coins:
@@ -49,6 +50,7 @@ class CoinGame(minenv.SimpleEnvironment[ActType, ObsType]):
 		self._obs_window: Tuple[int, int] = grid_shape if obs_window is None else obs_window
 
 		self._coin_payoffs = coin_payoffs
+		self.current_coin_color = self._rng.integers(2, 4) # maintain a memory of which color coin was generated in last step
 
 	def reset(self) -> Tuple[Tuple[ObsType, ObsType], Set[ActType]]:
 		super(CoinGame, self).reset()
@@ -153,7 +155,14 @@ class CoinGame(minenv.SimpleEnvironment[ActType, ObsType]):
 	def _place_coins(self, n_coins: int):
 		for coin_idx in self._sample_from_grid(size=n_coins, p=1-np.max(self._state, axis=0)):
 			# assign each coin a color, blue or red, each with probability 1/2
-			self._state[(self._rng.integers(2, 4), *coin_idx)] = 1
+			self._state[(self.current_coin_color, *coin_idx)] = 1
+			if self.current_coin_color == 2:
+				self.current_coin_color = 3
+			elif self.current_coin_color == 3:
+				self.current_coin_color = 2
+			else:
+				raise ValueError(f'Last coin was {self.current_coin_color}')
+			# print(f'Placed coin at {coin_idx} with color {self.current_coin_color}')
 
 	def _sample_from_grid(self, size: Optional[int] = None, replace: bool = False, p: Optional[NDArray[np.float64]] = None) -> Generator[Tuple[int, ...], None, None]:
 		if p is not None:
